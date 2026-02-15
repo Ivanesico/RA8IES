@@ -1,27 +1,119 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export function PrediccionCCAA() {
-  const [datos, setDatos] = useState(null);
-  const { ccaa } = useParams();
+  const { ccaa } = useParams(); //Lee el parámetro :ccaa de la url
+  const [datos, setDatos] = useState(null); //Estado para guardar los datos recibidos del backend
+  const [error, setError] = useState(null); //Estado para guardar un mensaje de error
+  // Diccionario para pasar a código lo que mande el usuario
+  const codigos = {
+    andalucia: "and",
+    aragon: "arn",
+    asturias: "ast",
+    "principado-de-asturias": "ast",
+    "islas-baleares": "bal",
+    baleares: "bal", 
+    canarias: "coo",
+    cantabria: "can",
+    "castilla-y-leon": "cle",
+    "castilla-la-mancha": "clm",
+    cataluna: "cat",
+    "comunitat-valenciana": "val",
+    "comunidad-valenciana": "val",
+    extremadura: "ext",
+    galicia: "gal",
+    madrid: "mad",
+    "comunidad-de-madrid": "mad",
+    murcia: "mur",
+    "region-de-murcia": "mur",
+    navarra: "nav",
+    "pais-vasco": "pva",
+    "la-rioja": "rio",
+    rioja: "rio",
+  };
 
+  // Se ejecuta al montar el componente o cada vez que cambie ccaa
   useEffect(() => {
-    fetch(`/api/aemet/prediccion/ccaa/hoy/${encodeURIComponent(ccaa)}`)
-      .then((res) => res.json())
-      .then((json) => setDatos(json.datos));
-  }, []);
+    // Si no hay ccaa no hace petición
+    if (!ccaa) return;
+    // Normaliza lo mandado por el usuario
+    const ccaaTocod = String(ccaa)
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") // quita tildes
+      .replace(/[^a-z0-9]+/g, "-") // cualquier cosa (espacios, comas, etc) -> "-"
+      .replace(/^-+|-+$/g, "");
 
-  if (!datos) return <div className="text-center mt-5">Cargando...</div>;
+    const codigo = codigos[ccaaTocod];
+
+    // Llamada al backend
+    fetch(`/api/aemet/prediccion/ccaa/hoy/${codigo}`)
+      // Recoge el json
+      .then(async (res) => {
+        if (!res.ok) {
+          const txt = await res.text();
+          throw new Error(`HTTP ${res.status}: ${txt}`);
+        }
+        return res.json();
+      })
+      .then((json) => {
+        // Si success es false lanza error
+        if (!json.success) throw new Error(json.error || "Error desconocido");
+        // Si no establece data del json a datos
+        setDatos(json.data);
+      })
+      .catch((e) => setError(e.message));
+  }, [ccaa]);
+  // Si hay error manda un mensaje con el error
+  if (error) return <div className="alert alert-danger mt-4">{error}</div>;
+  // Si no hay datos devuelve un texto
+  if (!datos)
+    return <div className="text-center mt-5">No se han encontrado datos</div>;
+
   return (
-    <div className="container my-4">
-      <h1>Predicción en {datos.ccaa}</h1>
-      <p className="text-muted">
-        {datos.validaPara} · Actualizado a las {datos.hora}
-      </p>
+    <div>
+      {/*Cabecera*/}
+      <div>
+        <h1>Tiempo en España</h1>
+        <img src="/assets/aemetLogo.png" alt="logo de AEMET" />
+        <Link to="/">
+          <button>Volver al inicio</button>
+        </Link>
+      </div>
+      {/*Datos de predicciones*/}
+      <div className="container my-4">
+        <h1>Predicción en {datos.ccaa}</h1>
+        <p className="text-muted">
+          {datos.validaPara} · Actualizado a las {datos.hora}
+        </p>
 
-      
+        <h3>Fenómenos significativos</h3>
+        <ul>
+          {/*Recorre el array de fenomenos*/}
+          {datos.fenomenos.map((f, i) => (
+            // se usa key porque ayuda a react a identificar cada elemento de la lista
+            <li key={i}>{f}</li>
+          ))}
+        </ul>
 
-      <p className="text-muted mt-3">Fuente: {datos.fuente}</p>
+        <h3>Predicción</h3>
+        <ul>
+          {/*Recorre el array de predicciones*/}
+          {datos.prediccion.map((p, i) => (
+            <li key={i}>{p}</li>
+          ))}
+        </ul>
+
+        <p className="text-muted mt-3">Fuente: {datos.fuente}</p>
+      </div>
+      {/*Pie de página*/}
+      <div className="row sin-m">
+        <div className="col-12 pie">
+          <p className="textoPie">&copy;AEMET METEO</p>
+        </div>
+      </div>
     </div>
   );
 }

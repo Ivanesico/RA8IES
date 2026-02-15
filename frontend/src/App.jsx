@@ -7,11 +7,20 @@ import { useState } from "react";
 function App() {
   const navegar = useNavigate();
   const [ccaa, setCcaa] = useState("");
-
+  function normalizaCCAA(input) {
+    return String(input ?? "")
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
   const ccaaSubmit = (e) => {
     e.preventDefault();
     // aquí podrías validar q si quieres
-    navegar(`/prediccion/${encodeURIComponent(ccaa)}`);
+    const slug = normalizaCCAA(ccaa);
+    navegar(`/prediccion/${slug}`);
   };
   return (
     <>
@@ -27,7 +36,6 @@ function App() {
           <form onSubmit={ccaaSubmit}>
             <input
               type="search"
-              
               onChange={(e) => setCcaa(e.target.value)}
               placeholder="Buscar ccaa..."
             />
