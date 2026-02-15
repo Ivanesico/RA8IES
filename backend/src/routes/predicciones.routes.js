@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import { parseAemetCcaaPrediction } from '../utils/ccaaParser.js';
+import { parseAemetProvinciaPrediction } from '../utils/provinciaParser.js';
+
 const router = Router();
 const AEMET_BASE = "https://opendata.aemet.es/opendata/api/";
 
@@ -16,14 +18,17 @@ router.get("/prediccion/provincia/hoy/:provincia", async (req, res) => {
             success: false,
             error: 'Falta API KEY'
         });
-
+        console.log("provincia param:", provincia);
         // Petición al endpoint
         const response = await fetch(AEMET_BASE + `prediccion/provincia/hoy/${provincia}?api_key=${API_KEY}`);
         if (!response.ok) {
             throw new Error('Error HTTP: ' + response.status);
         }
+        console.log("meta status:", response.status);
         //Recogemos datos del endpoint
         const meta = await response.json();
+        console.log("meta.datos:", meta.datos);
+        console.log("meta.metadatos:", meta.metadatos);
         // Si no encontramos dentro del json al campo datos devuelve fallo
         // La variable datos devuelve un url con los datos finales
         if (!meta?.datos) return res.status(502).json({
@@ -37,8 +42,18 @@ router.get("/prediccion/provincia/hoy/:provincia", async (req, res) => {
         if (!response2.ok) {
             throw new Error('Error recogida datos de url: ' + response2.status);
         }
-        // Pasamos el resultado a texto ya que nos devuelve un texto plano
-        const prediccion = await response2.text();
+        // Recogemos el resultado que nos da de texto y lo convertimos en json
+        const texto = await response2.arrayBuffer();
+        if (!texto) {
+            return res.status(502).json({ success: false, error: "AEMET devolvió texto vacío" });
+        }
+        const rawText = new TextDecoder("latin1").decode(texto);
+        // Loguea cosas que identifican el boletín
+        console.log("raw starts:", rawText.slice(0, 120));
+        console.log("raw zona line:", rawText.match(/PREDICCIÓN.*\n/i)?.[0]);
+        console.log("raw contiene ALBACETE:", rawText.includes("ALBACETE"));
+        console.log("raw contiene BADAJOZ:", rawText.includes("BADAJOZ"));
+        const prediccion = parseAemetProvinciaPrediction(rawText);
         // Enviamos la respuesta en json
         res.json({
             success: true,
@@ -88,8 +103,13 @@ router.get("/prediccion/provincia/manana/:provincia", async (req, res) => {
         if (!response2.ok) {
             throw new Error('Error en la recogida de datos de url' + response2.status);
         }
-        // Pasamos el resultado a texto ya que nos devuelve un texto plano
-        const prediccion = response2.text();
+        // Recogemos el resultado que nos da de texto y lo convertimos en json
+        const texto = await response2.arrayBuffer();
+        if (!texto) {
+            return res.status(502).json({ success: false, error: "AEMET devolvió texto vacío" });
+        }
+        const rawText = new TextDecoder("latin1").decode(texto);
+        const prediccion = parseAemetProvinciaPrediction(rawText);
         res.json({
             success: true,
             data: prediccion
@@ -137,7 +157,7 @@ router.get("/prediccion/ccaa/hoy/:ccaa", async (req, res) => {
         if (!response2.ok) {
             throw new Error('Error recogida datos de url: ' + response2.status);
         }
-        // Pasamos el resultado a texto ya que nos devuelve un texto plano
+        // Recogemos el resultado que nos da de texto y lo convertimos en json
         const texto = await response2.arrayBuffer();
         if (!texto) {
             return res.status(502).json({ success: false, error: "AEMET devolvió texto vacío" });
@@ -193,7 +213,7 @@ router.get("/prediccion/ccaa/manana/:ccaa", async (req, res) => {
         if (!response2.ok) {
             throw new Error('Error recogida datos de url: ' + response2.status);
         }
-        // Pasamos el resultado a texto ya que nos devuelve un texto plano
+        // Recogemos el resultado que nos da de texto y lo convertimos en json
         const texto = await response2.arrayBuffer();
         if (!texto) {
             return res.status(502).json({ success: false, error: "AEMET devolvió texto vacío" });
