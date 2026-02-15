@@ -48,11 +48,7 @@ router.get("/prediccion/provincia/hoy/:provincia", async (req, res) => {
             return res.status(502).json({ success: false, error: "AEMET devolvió texto vacío" });
         }
         const rawText = new TextDecoder("latin1").decode(texto);
-        // Loguea cosas que identifican el boletín
-        console.log("raw starts:", rawText.slice(0, 120));
-        console.log("raw zona line:", rawText.match(/PREDICCIÓN.*\n/i)?.[0]);
-        console.log("raw contiene ALBACETE:", rawText.includes("ALBACETE"));
-        console.log("raw contiene BADAJOZ:", rawText.includes("BADAJOZ"));
+
         const prediccion = parseAemetProvinciaPrediction(rawText);
         // Enviamos la respuesta en json
         res.json({
