@@ -7,6 +7,7 @@ import { useState } from "react";
 function App() {
   const navegar = useNavigate();
   const [ccaa, setCcaa] = useState("");
+  const [provincia, setProvincia] = useState("");
   function normalizaCCAA(input) {
     return String(input ?? "")
       .trim()
@@ -16,11 +17,18 @@ function App() {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
   }
+  // Evento del boton de ccaa
   const ccaaSubmit = (e) => {
     e.preventDefault();
-    // aquí podrías validar q si quieres
     const slug = normalizaCCAA(ccaa);
-    navegar(`/prediccion/${slug}`);
+    navegar(`/prediccion/ccaa/${slug}`);
+  };
+
+    // Evento del boton de provincia
+  const provinciaSubmit = (e) => {
+    e.preventDefault();
+    // aquí podrías validar q si quieres
+    navegar(`/prediccion/provincia/${provincia}`);
   };
   return (
     <>
@@ -31,8 +39,9 @@ function App() {
       </div>
       {/* Cards*/}
       <div>
+        {/*Card prediccion ccaa*/}
         <div id="tiempoCcaa" className="card cards" style={{ width: "18rem" }}>
-          <h3>Tiempo en tu municipio</h3>
+          <h3>Tiempo en tu CCAA</h3>
           <form onSubmit={ccaaSubmit}>
             <input
               type="search"
@@ -42,7 +51,24 @@ function App() {
             <button type="submit">Buscar</button>
           </form>
         </div>
+        {/*Card prediccion provincia*/}
+        <div
+          id="tiempoProvincia"
+          className="card cards"
+          style={{ width: "18rem" }}
+        >
+          <h3>Tiempo en tu provincia</h3>
+          <form onSubmit={provinciaSubmit}>
+            <input
+              type="search"
+              onChange={(e) => setProvincia(e.target.value)}
+              placeholder="Buscar provincia..."
+            />
+            <button type="submit">Buscar</button>
+          </form>
+        </div>
       </div>
+
       {/* Pie de página*/}
       <div className="row sin-m">
         <div className="col-12 pie">
