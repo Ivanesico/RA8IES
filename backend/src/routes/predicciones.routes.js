@@ -54,7 +54,7 @@ router.get("/prediccion/provincia/hoy/:provincia", async (req, res) => {
 });
 
 //Obtener preddicion de mañana por provincia
-router.get("prediccion/provincia/manana/:provincia", async (req, res) => {
+router.get("/prediccion/provincia/manana/:provincia", async (req, res) => {
     try {
         const { provincia } = req.params;
         const API_KEY = process.env.AEMET_API_KEY;
@@ -98,6 +98,106 @@ router.get("prediccion/provincia/manana/:provincia", async (req, res) => {
         res.status(500).json({
             success: false,
             error: "Error al obtener la predicción"
+        });
+    }
+});
+
+//Obtener prediccion de hoy de CCAA
+router.get("/prediccion/ccaa/hoy/:ccaa", async (req, res) => {
+    try {
+
+        const { ccaa } = req.params;
+        const API_KEY = process.env.AEMET_API_KEY;
+
+        // Si no encuentra API KEY lanza error
+        if (!API_KEY) return res.status(500).json({
+            success: false,
+            error: 'Falta API KEY'
+        });
+
+        // Petición al endpoint
+        const response = await fetch(AEMET_BASE + `prediccion/ccaa/hoy/${ccaa}?api_key=${API_KEY}`);
+        if (!response.ok) {
+            throw new Error('Error HTTP: ' + response.status);
+        }
+        //Recogemos datos del endpoint
+        const meta = await response.json();
+        // Si no encontramos dentro del json al campo datos devuelve fallo
+        // La variable datos devuelve un url con los datos finales
+        if (!meta?.datos) return res.status(502).json({
+            success: false,
+            error: 'AEMET no devolvió url con datos'
+        });
+
+        // Petición a la url
+        const response2 = await fetch(meta.datos);
+
+        if (!response2.ok) {
+            throw new Error('Error recogida datos de url: ' + response2.status);
+        }
+        // Pasamos el resultado a texto ya que nos devuelve un texto plano
+        const prediccion = await response2.text();
+        // Enviamos la respuesta en json
+        res.json({
+            success: true,
+            data: prediccion
+        });
+
+    } catch (error) {
+        console.error('Error: ', error);
+        res.status(500).json({
+            success: false,
+            error: 'Error al obtener la predicción'
+        });
+    }
+});
+
+//Obtener prediccion de manana de CCAA
+router.get("/prediccion/ccaa/manana/:ccaa", async (req, res) => {
+    try {
+
+        const { ccaa } = req.params;
+        const API_KEY = process.env.AEMET_API_KEY;
+
+        // Si no encuentra API KEY lanza error
+        if (!API_KEY) return res.status(500).json({
+            success: false,
+            error: 'Falta API KEY'
+        });
+
+        // Petición al endpoint
+        const response = await fetch(AEMET_BASE + `prediccion/ccaa/manana/${ccaa}?api_key=${API_KEY}`);
+        if (!response.ok) {
+            throw new Error('Error HTTP: ' + response.status);
+        }
+        //Recogemos datos del endpoint
+        const meta = await response.json();
+        // Si no encontramos dentro del json al campo datos devuelve fallo
+        // La variable datos devuelve un url con los datos finales
+        if (!meta?.datos) return res.status(502).json({
+            success: false,
+            error: 'AEMET no devolvió url con datos'
+        });
+
+        // Petición a la url
+        const response2 = await fetch(meta.datos);
+
+        if (!response2.ok) {
+            throw new Error('Error recogida datos de url: ' + response2.status);
+        }
+        // Pasamos el resultado a texto ya que nos devuelve un texto plano
+        const prediccion = await response2.text();
+        // Enviamos la respuesta en json
+        res.json({
+            success: true,
+            data: prediccion
+        });
+
+    } catch (error) {
+        console.error('Error: ', error);
+        res.status(500).json({
+            success: false,
+            error: 'Error al obtener la predicción'
         });
     }
 });

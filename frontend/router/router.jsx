@@ -7,7 +7,11 @@ import {Radar} from '../src/components/radar';
 export const router = createBrowserRouter([
     {
         path: "/",
+        element: <App/>
+    },{
+         path: "/radar",
         element: <Radar/>
     }
+
 
 ]);
