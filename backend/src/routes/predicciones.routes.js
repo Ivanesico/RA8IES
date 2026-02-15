@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { parseAemetCcaaPrediction } from '../utils/ccaaParser.js';
 const router = Router();
 const AEMET_BASE = "https://opendata.aemet.es/opendata/api/";
 
@@ -117,6 +118,7 @@ router.get("/prediccion/ccaa/hoy/:ccaa", async (req, res) => {
 
         // Petición al endpoint
         const response = await fetch(AEMET_BASE + `prediccion/ccaa/hoy/${ccaa}?api_key=${API_KEY}`);
+
         if (!response.ok) {
             throw new Error('Error HTTP: ' + response.status);
         }
@@ -136,7 +138,13 @@ router.get("/prediccion/ccaa/hoy/:ccaa", async (req, res) => {
             throw new Error('Error recogida datos de url: ' + response2.status);
         }
         // Pasamos el resultado a texto ya que nos devuelve un texto plano
-        const prediccion = await response2.text();
+        const texto = await response2.arrayBuffer();
+        if (!texto) {
+            return res.status(502).json({ success: false, error: "AEMET devolvió texto vacío" });
+        }
+        const rawText = new TextDecoder("latin1").decode(texto);
+        const prediccion = parseAemetCcaaPrediction(rawText);
+
         // Enviamos la respuesta en json
         res.json({
             success: true,
@@ -147,7 +155,7 @@ router.get("/prediccion/ccaa/hoy/:ccaa", async (req, res) => {
         console.error('Error: ', error);
         res.status(500).json({
             success: false,
-            error: 'Error al obtener la predicción'
+            error: error?.message ?? String(error),
         });
     }
 });
@@ -186,7 +194,12 @@ router.get("/prediccion/ccaa/manana/:ccaa", async (req, res) => {
             throw new Error('Error recogida datos de url: ' + response2.status);
         }
         // Pasamos el resultado a texto ya que nos devuelve un texto plano
-        const prediccion = await response2.text();
+        const texto = await response2.arrayBuffer();
+        if (!texto) {
+            return res.status(502).json({ success: false, error: "AEMET devolvió texto vacío" });
+        }
+        const rawText = new TextDecoder("latin1").decode(texto);
+        const prediccion = parseAemetCcaaPrediction(rawText);
         // Enviamos la respuesta en json
         res.json({
             success: true,

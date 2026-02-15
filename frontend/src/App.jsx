@@ -6,12 +6,12 @@ import { useState } from "react";
 
 function App() {
   const navegar = useNavigate();
-  const [municipio, setMunicipio] = useState("");
+  const [ccaa, setCcaa] = useState("");
 
-  const municipioSubmit = (e) => {
+  const ccaaSubmit = (e) => {
     e.preventDefault();
     // aquí podrías validar q si quieres
-    navegar(`/prediccion?municipio=${encodeURIComponent(municipio)}`);
+    navegar(`/prediccion/${encodeURIComponent(ccaa)}`);
   };
   return (
     <>
@@ -22,23 +22,23 @@ function App() {
       </div>
       {/* Cards*/}
       <div>
-        <div id="tiempoMunicipio" class="card cards" style={{ width: "18rem" }}>
+        <div id="tiempoCcaa" className="card cards" style={{ width: "18rem" }}>
           <h3>Tiempo en tu municipio</h3>
-          <form onSubmit={municipioSubmit}>
+          <form onSubmit={ccaaSubmit}>
             <input
               type="search"
-              value="municipio"
-              onChange={(e) => setMunicipio(e.target.value)}
-              placeholder="Buscar municipio..."
+              
+              onChange={(e) => setCcaa(e.target.value)}
+              placeholder="Buscar ccaa..."
             />
             <button type="submit">Buscar</button>
           </form>
         </div>
       </div>
       {/* Pie de página*/}
-      <div class="row sin-m">
-        <div class="col-12 pie">
-          <p class="textoPie">&copy;AEMET METEO</p>
+      <div className="row sin-m">
+        <div className="col-12 pie">
+          <p className="textoPie">&copy;AEMET METEO</p>
         </div>
       </div>
     </>
