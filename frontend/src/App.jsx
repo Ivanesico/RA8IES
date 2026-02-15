@@ -24,7 +24,7 @@ function App() {
     navegar(`/prediccion/ccaa/${slug}`);
   };
 
-    // Evento del boton de provincia
+  // Evento del boton de provincia
   const provinciaSubmit = (e) => {
     e.preventDefault();
     // aquí podrías validar q si quieres
@@ -68,7 +68,18 @@ function App() {
           </form>
         </div>
       </div>
-
+      {/*Div radar */}
+      <div>
+        <Link to="/radar">
+          <img
+            className="radarImg"
+            src="/api/aemet/red/radar/nacional"
+            alt="Radar AEMET"
+            width={"50%"}
+            style={{ width: "220px", height: "auto" }}
+          />{" "}
+        </Link>
+      </div>
       {/* Pie de página*/}
       <div className="row sin-m">
         <div className="col-12 pie">
