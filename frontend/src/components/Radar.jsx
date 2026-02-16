@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import aemetLogo from "../assets/aemetLogo.png";
 
 export function Radar() {
   return (
@@ -20,7 +21,7 @@ export function Radar() {
         </div>
         <img
           className="radarImg"
-          src="/api/aemet/red/radar/nacional"
+          src={aemetLogo}
           alt="Radar AEMET"
         />
       </section>
@@ -28,7 +29,7 @@ export function Radar() {
       {/*Pie de página*/}
       <div className="row sin-m">
         <div className="col-12 pie">
-          <p className="textoPie">&copy;AEMET METEO</p>
+          <p className="textoPie">&copy;AEMET METEO IVÁN ESCOBAR</p>
         </div>
       </div>
 

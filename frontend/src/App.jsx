@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useState, useMemo } from "react";
 import { toSlug } from "./utils/textUtils";
+import aemetLogo from "./assets/aemetLogo.png";
 //Imports para el mapa
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import L from "leaflet";
@@ -80,7 +81,7 @@ function App() {
       {/*Cabecera*/}
       <div>
         <h1>Tiempo en España</h1>
-        <img src="/assets/aemetLogo.png" alt="logo de AEMET" />
+        <img src={aemetLogo} alt="logo de AEMET" />
       </div>
 
       {/* Cards*/}
@@ -214,7 +215,7 @@ function App() {
       {/* Pie de página*/}
       <div className="row sin-m">
         <div className="col-12 pie">
-          <p className="textoPie">&copy;AEMET METEO</p>
+          <p className="textoPie">&copy;AEMET METEO IVÁN ESCOBAR</p>
         </div>
       </div>
     </>

@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { toSlug } from "../utils/textUtils.js";
 import { codigos_ccaa } from "../constants/diccionarios";
+import aemetLogo from "../assets/aemetLogo.png";
+
 
 export function PrediccionCCAA() {
   const { ccaa } = useParams(); //Lee el parámetro :ccaa de la url
@@ -47,7 +49,7 @@ export function PrediccionCCAA() {
       {/*Cabecera*/}
       <div>
         <h1>Tiempo en España</h1>
-        <img src="/assets/aemetLogo.png" alt="logo de AEMET" />
+        <img src={aemetLogo} alt="logo de AEMET" />
         <Link to="/">
           <button>Volver al inicio</button>
         </Link>
@@ -81,7 +83,7 @@ export function PrediccionCCAA() {
       {/*Pie de página*/}
       <div className="row sin-m">
         <div className="col-12 pie">
-          <p className="textoPie">&copy;AEMET METEO</p>
+          <p className="textoPie">&copy;AEMET METEO IVÁN ESCOBAR</p>
         </div>
       </div>
     </div>

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { toSlug } from "../utils/textUtils.js";
-
+import aemetLogo from "../assets/aemetLogo.png";
 import { codigos_provincia } from "../constants/diccionarios";
 
 export function PrediccionProvincia() {
@@ -47,7 +47,7 @@ export function PrediccionProvincia() {
       {/*Cabecera*/}
       <div>
         <h1>Tiempo en España</h1>
-        <img src="/assets/aemetLogo.png" alt="logo de AEMET" />
+        <img src={aemetLogo} alt="logo de AEMET" />
         <Link to="/">
           <button>Volver al inicio</button>
         </Link>
@@ -86,7 +86,7 @@ export function PrediccionProvincia() {
       {/*Pie de página*/}
       <div className="row sin-m">
         <div className="col-12 pie">
-          <p className="textoPie">&copy;AEMET METEO</p>
+          <p className="textoPie">&copy;AEMET METEO IVÁN ESCOBAR</p>
         </div>
       </div>
     </div>

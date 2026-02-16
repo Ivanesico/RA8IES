@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
+import aemetLogo from "../assets/aemetLogo.png";
+
 
 // Función para convertir grados a radianes
 function toRad(v) {
@@ -18,9 +21,8 @@ function haversineKm(lat1, lon1, lat2, lon2) {
 
 // Función para obtener el tiempo en tiempo real
 export function ObservacionTiempoReal() {
-
   const [searchParams] = useSearchParams(); //Da acceso a los params de la ruta
-  const lat = Number(searchParams.get("lat"));//Obtiene lat de la ruta
+  const lat = Number(searchParams.get("lat")); //Obtiene lat de la ruta
   const lon = Number(searchParams.get("lon")); //Obtiene lon de la ruta
 
   const [estaciones, setEstaciones] = useState([]); //estado de las estaciones
@@ -61,7 +63,8 @@ export function ObservacionTiempoReal() {
     };
   }, []);
   // Calcula la estación mas cercana
-  const nearest = useMemo(() => {//useMemo guarda el resultado que solo recalcula si cambia la estacion
+  const nearest = useMemo(() => {
+    //useMemo guarda el resultado que solo recalcula si cambia la estacion
     console.log("lat/lon query:", lat, lon);
     console.log("estaciones length:", estaciones.length);
     // Si estaciones no contiene nada devuelve null
@@ -84,8 +87,15 @@ export function ObservacionTiempoReal() {
       }
     }
 
-    console.log("mejorEstacion:", mejorEstacion?.ubi, "mejorDistancia:", mejorDistancia);
-    return mejorEstacion ? { station: mejorEstacion, distanceKm: mejorDistancia } : null;
+    console.log(
+      "mejorEstacion:",
+      mejorEstacion?.ubi,
+      "mejorDistancia:",
+      mejorDistancia,
+    );
+    return mejorEstacion
+      ? { station: mejorEstacion, distanceKm: mejorDistancia }
+      : null;
   }, [estaciones, lat, lon]);
 
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
@@ -99,48 +109,67 @@ export function ObservacionTiempoReal() {
   }
 
   return (
-    <div className="container py-4">
-      <h1 className="h4 mb-3">Observación en tiempo real</h1>
+    <div>
+      {/*Cabecera*/}
+      <div>
+        <h1>Tiempo en España</h1>
+        <img  src={aemetLogo} alt="logo de AEMET" />
+        <Link to="/">
+          <button>Volver al inicio</button>
+        </Link>
+      </div>
+    {/*Datos*/}
+      <div className="container py-4">
+        <h1 className="h4 mb-3">Observación en tiempo real</h1>
 
-      {loading && <div className="alert alert-info">Cargando estaciones…</div>}
-      {error && <div className="alert alert-danger">Error: {error}</div>}
+        {loading && (
+          <div className="alert alert-info">Cargando estaciones…</div>
+        )}
+        {error && <div className="alert alert-danger">Error: {error}</div>}
 
-      {!loading && !error && nearest?.station && (
-        <div className="card shadow-sm">
-          <div className="card-body">
-            <h2 className="h5 mb-1">{nearest.station.ubi}</h2>
-            <div className="text-secondary small mb-3">
-              Estación: {nearest.station.idema} · A{" "}
-              {nearest.distanceKm.toFixed(1)} km · Medida:{" "}
-              {nearest.station.fint}
-            </div>
+        {!loading && !error && nearest?.station && (
+          <div className="card shadow-sm">
+            <div className="card-body">
+              <h2 className="h5 mb-1">{nearest.station.ubi}</h2>
+              <div className="text-secondary small mb-3">
+                Estación: {nearest.station.idema} · A{" "}
+                {nearest.distanceKm.toFixed(1)} km · Medida:{" "}
+                {nearest.station.fint}
+              </div>
 
-            <div className="d-flex gap-2 flex-wrap">
-              <span className="badge text-bg-primary">
-                Temp: {nearest.station.ta ?? "—"} ºC
-              </span>
-              <span className="badge text-bg-secondary">
-                HR: {nearest.station.hr ?? "—"} %
-              </span>
-              <span className="badge text-bg-info">
-                Lluvia: {nearest.station.prec ?? "—"} mm
-              </span>
-              <span className="badge text-bg-warning">
-                Viento: {nearest.station.vv ?? "—"} m/s
-              </span>
-              <span className="badge text-bg-dark">
-                Racha: {nearest.station.vmax ?? "—"} m/s
-              </span>
+              <div className="d-flex gap-2 flex-wrap">
+                <span className="badge text-bg-primary">
+                  Temp: {nearest.station.ta ?? "—"} ºC
+                </span>
+                <span className="badge text-bg-secondary">
+                  HR: {nearest.station.hr ?? "—"} %
+                </span>
+                <span className="badge text-bg-info">
+                  Lluvia: {nearest.station.prec ?? "—"} mm
+                </span>
+                <span className="badge text-bg-warning">
+                  Viento: {nearest.station.vv ?? "—"} m/s
+                </span>
+                <span className="badge text-bg-dark">
+                  Racha: {nearest.station.vmax ?? "—"} m/s
+                </span>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {!loading && !error && !nearest?.station && (
-        <div className="alert alert-warning">
-          No se encontró estación cercana.
+        {!loading && !error && !nearest?.station && (
+          <div className="alert alert-warning">
+            No se encontró estación cercana.
+          </div>
+        )}
+      </div>
+        {/*Pie de página*/}
+      <div className="row sin-m">
+        <div className="col-12 pie">
+          <p className="textoPie">&copy;AEMET METEO IVÁN ESCOBAR</p>
         </div>
-      )}
+      </div>
     </div>
   );
 }
