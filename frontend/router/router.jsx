@@ -4,6 +4,7 @@ import { Radar } from "../src/components/radar";
 import { PrediccionCCAA } from "../src/components/PrediccionCCAA";
 import { PrediccionProvincia } from "../src/components/PrediccionProvincia";
 import { ObservacionTiempoReal } from "../src/components/ObservacionTiempoReal";
+import { MayoresDatos } from "../src/components/MayoresDatos";
 
 export const router = createBrowserRouter([
   {
@@ -25,5 +26,8 @@ export const router = createBrowserRouter([
   {
     path: "/observacion/tiempo-real",
     element: <ObservacionTiempoReal />,
+  }, {
+    path: "/observacion/mayores-datos",
+    element: <MayoresDatos />,
   },
 ]);

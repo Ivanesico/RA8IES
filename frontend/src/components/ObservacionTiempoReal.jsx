@@ -3,7 +3,6 @@ import { useSearchParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import aemetLogo from "../assets/aemetLogo.png";
 
-
 // Función para convertir grados a radianes
 function toRad(v) {
   return (v * Math.PI) / 180;
@@ -94,7 +93,7 @@ export function ObservacionTiempoReal() {
       mejorDistancia,
     );
     return mejorEstacion
-      ? { station: mejorEstacion, distanceKm: mejorDistancia }
+      ? { estacion: mejorEstacion, distanciaKm: mejorDistancia }
       : null;
   }, [estaciones, lat, lon]);
 
@@ -113,58 +112,60 @@ export function ObservacionTiempoReal() {
       {/*Cabecera*/}
       <div>
         <h1>Tiempo en España</h1>
-        <img  src={aemetLogo} alt="logo de AEMET" />
+        <img src={aemetLogo} alt="logo de AEMET" />
         <Link to="/">
           <button>Volver al inicio</button>
         </Link>
       </div>
-    {/*Datos*/}
+      {/*Datos*/}
       <div className="container py-4">
         <h1 className="h4 mb-3">Observación en tiempo real</h1>
 
         {loading && (
-          <div className="alert alert-info">Cargando estaciones…</div>
+          <div className="spinner-border" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
         )}
         {error && <div className="alert alert-danger">Error: {error}</div>}
 
-        {!loading && !error && nearest?.station && (
+        {!loading && !error && nearest?.estacion && (
           <div className="card shadow-sm">
             <div className="card-body">
-              <h2 className="h5 mb-1">{nearest.station.ubi}</h2>
+              <h2 className="h5 mb-1">{nearest.estacion.ubi}</h2>
               <div className="text-secondary small mb-3">
-                Estación: {nearest.station.idema} · A{" "}
-                {nearest.distanceKm.toFixed(1)} km · Medida:{" "}
-                {nearest.station.fint}
+                Estación: {nearest.estacion.idema} · A{" "}
+                {nearest.distanciaKm.toFixed(1)} km · Medida:{" "}
+                {nearest.estacion.fint}
               </div>
 
               <div className="d-flex gap-2 flex-wrap">
                 <span className="badge text-bg-primary">
-                  Temp: {nearest.station.ta ?? "—"} ºC
+                  Temp: {nearest.estacion.ta ?? "—"} ºC
                 </span>
                 <span className="badge text-bg-secondary">
-                  HR: {nearest.station.hr ?? "—"} %
+                  HR: {nearest.estacion.hr ?? "—"} %
                 </span>
                 <span className="badge text-bg-info">
-                  Lluvia: {nearest.station.prec ?? "—"} mm
+                  Lluvia: {nearest.estacion.prec ?? "—"} mm
                 </span>
                 <span className="badge text-bg-warning">
-                  Viento: {nearest.station.vv ?? "—"} m/s
+                  Viento: {nearest.estacion.vv ?? "—"} m/s
                 </span>
                 <span className="badge text-bg-dark">
-                  Racha: {nearest.station.vmax ?? "—"} m/s
+                  Racha: {nearest.estacion.vmax ?? "—"} m/s
                 </span>
               </div>
             </div>
           </div>
         )}
 
-        {!loading && !error && !nearest?.station && (
+        {!loading && !error && !nearest?.estacion && (
           <div className="alert alert-warning">
             No se encontró estación cercana.
           </div>
         )}
       </div>
-        {/*Pie de página*/}
+      {/*Pie de página*/}
       <div className="row sin-m">
         <div className="col-12 pie">
           <p className="textoPie">&copy;AEMET METEO IVÁN ESCOBAR</p>

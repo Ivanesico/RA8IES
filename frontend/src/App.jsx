@@ -11,7 +11,6 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 function App() {
-
   const navegar = useNavigate();
   const [ccaa, setCcaa] = useState(""); //estado para mandar la ccaa escrita
   const [provincia, setProvincia] = useState(""); //estado para mandar la provincia escrita
@@ -86,7 +85,6 @@ function App() {
 
       {/* Cards*/}
       <div>
-
         {/*Card prediccion ccaa*/}
         <div id="tiempoCcaa" className="card cards" style={{ width: "18rem" }}>
           <h3>Tiempo en tu CCAA</h3>
@@ -114,6 +112,17 @@ function App() {
             />
             <button type="submit">Buscar</button>
           </form>
+        </div>
+        {/*Card mayores datos*/}
+        <div
+          id="mayoresDatos"
+          className="card cards"
+          style={{ width: "18rem" }}
+        >
+          <Link to="/observacion/mayores-datos">
+            {" "}
+            <h3>Mayores datos</h3>
+          </Link>
         </div>
         {/*Card observación tiempo real*/}
         <div
@@ -196,7 +205,6 @@ function App() {
             </div>
           </div>
         </div>
-
       </div>
 
       {/*Div radar */}
