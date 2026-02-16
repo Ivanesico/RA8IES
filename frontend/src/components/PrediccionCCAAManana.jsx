@@ -1,22 +1,24 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { codigos_ccaa } from "../constants/diccionarios";
 import aemetLogo from "../assets/aemetLogo.png";
-import { codigos_provincia } from "../constants/diccionarios";
 
-export function PrediccionProvincia() {
-  const { provincia } = useParams(); //Lee el parámetro :provincia de la url
+export function PrediccionCCAAManana() {
+  const { ccaa } = useParams(); //Lee el parámetro :ccaa de la url
   const [datos, setDatos] = useState(null); //Estado para guardar los datos recibidos del backend
   const [error, setError] = useState(null); //Estado para guardar un mensaje de error
 
   // Se ejecuta al montar el componente o cada vez que cambie ccaa
   useEffect(() => {
     // Si no hay ccaa no hace petición
-    if (!provincia) return;
+    if (!ccaa) return;
     // Normaliza lo mandado por el usuario
-    const codigo = codigos_provincia[provincia];
+   
+    const codigo = codigos_ccaa[ccaa];
+
     // Llamada al backend
-    fetch(`/api/aemet/prediccion/provincia/hoy/${codigo}`)
+    fetch(`/api/aemet/prediccion/ccaa/manana/${codigo}`)
       // Recoge el json
       .then(async (res) => {
         if (!res.ok) {
@@ -32,13 +34,11 @@ export function PrediccionProvincia() {
         setDatos(json.data);
       })
       .catch((e) => setError(e.message));
-  }, [provincia]);
-
+  }, [ccaa]);
   // Si hay error manda un mensaje con el error
   if (error) return <div className="alert alert-danger mt-4">{error}</div>;
   // Si no hay datos devuelve un texto
-  if (!datos)
-    return <div className="text-center mt-5">Cargando...</div>;
+  if (!datos) return <div className="text-center mt-5">Cargando...</div>;
 
   return (
     <div>
@@ -50,54 +50,48 @@ export function PrediccionProvincia() {
           <button>Volver al inicio</button>
         </Link>
       </div>
-         {/*Subcabecera*/}
+      {/*Subcabecera*/}
       <div>
         <ul class="nav">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href={`/prediccion/provincia/hoy/${provincia}`}>
+                
+
+            <a class="nav-link active" aria-current="page" href={`/prediccion/ccaa/hoy/${ccaa}`}>
               Hoy
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href={`/prediccion/provincia/manana/${provincia}`}>
+            <a class="nav-link"  href={`/prediccion/ccaa/manana/${ccaa}`}>
               Mañana
             </a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              
-            </a>
-          </li>
+          
+         
         </ul>
       </div>
-      {/* Datos de predicciones */}
+      {/*Datos de predicciones*/}
       <div className="container my-4">
-        {/* En provincia: "zona" en vez de "ccaa" */}
-        <h1>Predicción en {datos.zona}</h1>
-
-        {/* Aquí tienes fecha/hora/validez (si quieres mostrar fecha también) */}
+        <h1>Predicción en {datos.ccaa}</h1>
         <p className="text-muted">
-          {datos.validaPara} · {datos.fecha} · Actualizado a las {datos.hora}
+          {datos.validaPara} · Actualizado a las {datos.hora}
         </p>
 
-        {/* Predicción es un string largo */}
+        <h3>Fenómenos significativos</h3>
+        <ul>
+          {/*Recorre el array de fenomenos*/}
+          {datos.fenomenos.map((f, i) => (
+            // se usa key porque ayuda a react a identificar cada elemento de la lista
+            <li key={i}>{f}</li>
+          ))}
+        </ul>
+
         <h3>Predicción</h3>
-        <p>{datos.prediccion}</p>
-
-        {/* Tabla/Lista de temperaturas */}
-        <h3>Temperaturas mínimas y máximas</h3>
-
-        {datos.temperaturas?.length > 0 ? (
-          <ul>
-            {datos.temperaturas.map((t, i) => (
-              <li key={i}>
-                {t.localidad}: {t.min}°C / {t.max}°C
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-muted">No hay temperaturas disponibles.</p>
-        )}
+        <ul>
+          {/*Recorre el array de predicciones*/}
+          {datos.prediccion.map((p, i) => (
+            <li key={i}>{p}</li>
+          ))}
+        </ul>
 
         <p className="text-muted mt-3">Fuente: {datos.fuente}</p>
       </div>

@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import aemetLogo from "../assets/aemetLogo.png";
 import { codigos_provincia } from "../constants/diccionarios";
 
-export function PrediccionProvincia() {
+export function PrediccionProvinciaManana() {
   const { provincia } = useParams(); //Lee el parámetro :provincia de la url
   const [datos, setDatos] = useState(null); //Estado para guardar los datos recibidos del backend
   const [error, setError] = useState(null); //Estado para guardar un mensaje de error
@@ -16,7 +16,7 @@ export function PrediccionProvincia() {
     // Normaliza lo mandado por el usuario
     const codigo = codigos_provincia[provincia];
     // Llamada al backend
-    fetch(`/api/aemet/prediccion/provincia/hoy/${codigo}`)
+    fetch(`/api/aemet/prediccion/provincia/manana/${codigo}`)
       // Recoge el json
       .then(async (res) => {
         if (!res.ok) {

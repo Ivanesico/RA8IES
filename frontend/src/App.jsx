@@ -21,14 +21,14 @@ function App() {
   const ccaaSubmit = (e) => {
     e.preventDefault();
     const slug = toSlug(ccaa);
-    navegar(`/prediccion/ccaa/${slug}`);
+    navegar(`/prediccion/ccaa/hoy/${slug}`);
   };
 
   // Evento del botón de provincia
   const provinciaSubmit = (e) => {
     e.preventDefault();
     const slug = toSlug(provincia);
-    navegar(`/prediccion/provincia/${slug}`);
+    navegar(`/prediccion/provincia/hoy/${slug}`);
   };
 
   // Método para obtener la ubicación actual de la persona

@@ -1,24 +1,20 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { toSlug } from "../utils/textUtils.js";
 import { codigos_ccaa } from "../constants/diccionarios";
 import aemetLogo from "../assets/aemetLogo.png";
-
 
 export function PrediccionCCAA() {
   const { ccaa } = useParams(); //Lee el parámetro :ccaa de la url
   const [datos, setDatos] = useState(null); //Estado para guardar los datos recibidos del backend
   const [error, setError] = useState(null); //Estado para guardar un mensaje de error
-  
 
   // Se ejecuta al montar el componente o cada vez que cambie ccaa
   useEffect(() => {
     // Si no hay ccaa no hace petición
     if (!ccaa) return;
     // Normaliza lo mandado por el usuario
-    const ccaaTocod = toSlug(ccaa); 
-    const codigo = codigos_ccaa[ccaaTocod];
+    const codigo = codigos_ccaa[ccaa];
 
     // Llamada al backend
     fetch(`/api/aemet/prediccion/ccaa/hoy/${codigo}`)
@@ -41,8 +37,7 @@ export function PrediccionCCAA() {
   // Si hay error manda un mensaje con el error
   if (error) return <div className="alert alert-danger mt-4">{error}</div>;
   // Si no hay datos devuelve un texto
-  if (!datos)
-    return <div className="text-center mt-5">Cargando...</div>;
+  if (!datos) return <div className="text-center mt-5">Cargando...</div>;
 
   return (
     <div>
@@ -53,6 +48,26 @@ export function PrediccionCCAA() {
         <Link to="/">
           <button>Volver al inicio</button>
         </Link>
+      </div>
+      {/*Subcabecera*/}
+      <div>
+        <ul class="nav">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href={`/prediccion/ccaa/hoy/${ccaa}`}>
+              Hoy
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href={`/prediccion/ccaa/manana/${ccaa}`}>
+              Mañana
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              
+            </a>
+          </li>
+        </ul>
       </div>
       {/*Datos de predicciones*/}
       <div className="container my-4">
