@@ -1,50 +1,39 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+
+.sin-p{
+    padding:0;
+}
+.sin-m{
+    margin:0;
+}
+/* Color del pie de página */
+.pie{
+    background-color:gray;
+}
+.textoPie{
+    font-weight: bold;
+    font-size: larger;
+}
+.cards{
+    display:block;
+    margin-left:auto;
+    margin-right: auto;
+    margin-bottom: 2.5%;
+    margin-top:2.5%;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.25);
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-}
-
-.radar { height: 100vh; position: relative; overflow: hidden; }
-.radarImg {
+.map-container {
+  height: 350px;
   width: 100%;
-  height: 100vh;
-  object-fit: cover;
-  filter: contrast(1.2) saturate(1.1) brightness(1.05);
+  overflow: hidden;
+  border-radius: 0.75rem;
 }
+
+@media (max-width: 768px) {
+  .map-container {
+    height: 250px;
+  }
+}
+
+
