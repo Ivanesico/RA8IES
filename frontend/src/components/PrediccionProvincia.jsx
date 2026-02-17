@@ -37,72 +37,78 @@ export function PrediccionProvincia() {
   // Si hay error manda un mensaje con el error
   if (error) return <div className="alert alert-danger mt-4">{error}</div>;
   // Si no hay datos devuelve un texto
-  if (!datos)
-    return <div className="text-center mt-5">Cargando...</div>;
+  if (!datos) return <div className="text-center mt-5">Cargando...</div>;
 
   return (
-    <div>
+    <div className="container">
       {/*Cabecera*/}
+      <header className="bg-primary text-white py-4 mb-4">
+        <div className="container d-flex flex-column flex-md-row align-items-center gap-3">
+          <img src={aemetLogo} alt="logo AEMET" height="70" />
+          <h1 className="m-0 fw-bold">El Tiempo en España</h1>
+          <Link to="/" className="ms-auto">
+            <button className="btn btn-light">Volver al inicio</button>
+          </Link>
+        </div>
+      </header>
+      {/*Subcabecera*/}
       <div>
-        <h1>Tiempo en España</h1>
-        <img src={aemetLogo} alt="logo de AEMET" />
-        <Link to="/">
-          <button>Volver al inicio</button>
-        </Link>
-      </div>
-         {/*Subcabecera*/}
-      <div>
-        <ul class="nav">
+        <ul class="nav nav-tabs">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href={`/prediccion/provincia/hoy/${provincia}`}>
+            <Link
+              className="nav-link active"
+              to={`/prediccion/provincia/hoy/${provincia}`}
+            >
               Hoy
-            </a>
+            </Link>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href={`/prediccion/provincia/manana/${provincia}`}>
+          <li class="nav-item ">
+            <Link
+              className="nav-link"
+              to={`/prediccion/provincia/manana/${provincia}`}
+            >
               Mañana
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              
-            </a>
+            </Link>
           </li>
         </ul>
       </div>
       {/* Datos de predicciones */}
-      <div className="container my-4">
-        {/* En provincia: "zona" en vez de "ccaa" */}
-        <h1>Predicción en {datos.zona}</h1>
+      <div className="row my-4">
+        <div className="card shadow">
+          <div className="card-body">
+            <div className="d-flex flex-column justify-content-between align-items-start">
+              <h1>Predicción en {datos.zona}</h1>
+              <span className="text-muted small">
+                {datos.validaPara} · Actualizado a las {datos.hora}
+              </span>
+            </div>
+            {/* Predicción es un string largo */}
+            <div className="mb-2">
+              <h5>Predicción</h5>
+              <p>{datos.prediccion}</p>
+            </div>
+            <div>
+              {/* Tabla/Lista de temperaturas */}
+              <h5>Temperaturas mínimas y máximas</h5>
 
-        {/* Aquí tienes fecha/hora/validez (si quieres mostrar fecha también) */}
-        <p className="text-muted">
-          {datos.validaPara} · {datos.fecha} · Actualizado a las {datos.hora}
-        </p>
+              {datos.temperaturas?.length > 0 ? (
+                <ul className="list-group ">
+                  {datos.temperaturas.map((t, i) => (
+                    <li className="list-group-item" key={i}>
+                      {t.localidad}: {t.min}°C / {t.max}°C
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-muted">No hay temperaturas disponibles.</p>
+              )}
 
-        {/* Predicción es un string largo */}
-        <h3>Predicción</h3>
-        <p>{datos.prediccion}</p>
-
-        {/* Tabla/Lista de temperaturas */}
-        <h3>Temperaturas mínimas y máximas</h3>
-
-        {datos.temperaturas?.length > 0 ? (
-          <ul>
-            {datos.temperaturas.map((t, i) => (
-              <li key={i}>
-                {t.localidad}: {t.min}°C / {t.max}°C
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-muted">No hay temperaturas disponibles.</p>
-        )}
-
-        <p className="text-muted mt-3">Fuente: {datos.fuente}</p>
+            </div>
+          </div>
+        </div>
       </div>
       {/*Pie de página*/}
-      <div className="row sin-m">
+      <div className="row sin-m mt-5">
         <div className="col-12 pie">
           <p className="textoPie">&copy;AEMET METEO IVÁN ESCOBAR</p>
         </div>

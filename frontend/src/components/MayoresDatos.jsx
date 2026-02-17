@@ -91,33 +91,37 @@ export function MayoresDatos() {
       topTamin: top5menos(estaciones, "tamin", 5),
     };
   }, [estaciones]);
-  
+
   return (
-    <div>
-      <div>
-        {/*Cabecera*/}
-        <div>
-          <h1>Tiempo en España</h1>
-          <img src={aemetLogo} alt="logo de AEMET" />
-          <Link to="/">
-            <button>Volver al inicio</button>
+    <div className="container">
+      {/*Cabecera*/}
+      <header className="bg-primary text-white py-4 mb-4">
+        <div className="container d-flex flex-column flex-md-row align-items-center gap-3">
+          <img src={aemetLogo} alt="logo AEMET" height="70" />
+          <h1 className="m-0 fw-bold">El Tiempo en España</h1>
+          <Link to="/" className="ms-auto">
+            <button className="btn btn-light">Volver al inicio</button>
           </Link>
         </div>
-        {/*Cards*/}
+      </header>
+      {/*Texto presentación*/}
+      <h3 className="mb-4">Observación en tiempo real</h3>
+      {loading && (
+        <div className="text-center my-4">
+          <div className="spinner-border text-primary" role="status" />
+        </div>
+      )}
+      {error && (
+        <div className="alert alert-danger text-center">Error: {error}</div>
+      )}
+
+      {/*Cards*/}
+      <div className="row g-4">
+        {/*Card precipitaciones*/}
         <div className="col-12 col-md-6 col-lg-4">
-          <h1 className="h4 mb-3">Observación en tiempo real</h1>
-          {loading && (
-            <div className="spinner-border" role="status">
-              <span className="visually-hidden">Loading...</span>
-            </div>
-          )}
-          {error && <div className="alert alert-danger">Error: {error}</div>}
-
-          {/*Card precipitaciones*/}
-          <div className="card cards">
-            <div className="card-body" style={{ width: "18rem" }}>
+          <div className="card h-100 shadow">
+            <div className="card-body">
               <h5 className="card-title">Mayores precipitaciones</h5>
-
               <ul className="list-group list-group-flush">
                 {highlights.topPrec.map((s, i) => (
                   <li
@@ -125,18 +129,21 @@ export function MayoresDatos() {
                     className="list-group-item d-flex justify-content-between"
                   >
                     <span>{s.ubi}</span>
-                    <strong>{s.prec.toFixed(2)} mm</strong>
-                    <strong>{soloHora(s.fint)} </strong>
+                    <div className="text-end">
+                      <strong>{s.prec.toFixed(2)} mm</strong>
+                      <div className="small text-muted">{soloHora(s.fint)}{" h"}</div>
+                    </div>
                   </li>
                 ))}
               </ul>
             </div>
           </div>
-          {/*Card media vientos*/}
-          <div className="card cards">
-            <div className="card-body" style={{ width: "18rem" }}>
+        </div>
+        {/*Card media vientos*/}
+        <div className="col-12 col-md-6 col-lg-4">
+          <div className="card h-100 shadow">
+            <div className="card-body">
               <h5 className="card-title">Mayores medias de viento</h5>
-
               <ul className="list-group list-group-flush">
                 {highlights.topVv.map((s, i) => (
                   <li
@@ -144,18 +151,23 @@ export function MayoresDatos() {
                     className="list-group-item d-flex justify-content-between"
                   >
                     <span>{s.ubi}</span>
-                    <strong>{s.vv} km/h</strong>
-                    <strong>{soloHora(s.fint)} </strong>
+                    <div className="text-end">
+                      <strong>{s.vv} km/h</strong>
+                      <div className="small text-muted">
+                        {soloHora(s.fint)}{" h"}
+                      </div>
+                    </div>
                   </li>
                 ))}
               </ul>
             </div>
           </div>
-          {/*Card max viento*/}
-          <div className="card cards">
-            <div className="card-body" style={{ width: "18rem" }}>
+        </div>
+        {/*Card max viento*/}
+        <div className="col-12 col-md-6 col-lg-4">
+          <div className="card h-100 shadow">
+            <div className="card-body">
               <h5 className="card-title">Mayores rachas de viento</h5>
-
               <ul className="list-group list-group-flush">
                 {highlights.topVmax.map((s, i) => (
                   <li
@@ -163,16 +175,22 @@ export function MayoresDatos() {
                     className="list-group-item d-flex justify-content-between"
                   >
                     <span>{s.ubi}</span>
-                    <strong>{s.vmax} km/h</strong>
-                    <strong>{soloHora(s.fint)} </strong>{" "}
+                    <div className="text-end">
+                      <strong>{s.vmax} km/h</strong>
+                      <div className="text-muted small">
+                        {soloHora(s.fint)}{" h"}
+                      </div>{" "}
+                    </div>
                   </li>
                 ))}
               </ul>
             </div>
           </div>
-          {/*Card temp altas*/}
-          <div className="card cards">
-            <div className="card-body" style={{ width: "18rem" }}>
+        </div>
+        {/*Card temp altas*/}
+        <div className="col-12 col-md-6 col-lg-4 offset-lg-2">
+          <div className="card shadow h-100">
+            <div className="card-body">
               <h5 className="card-title">Temperaturas más altas</h5>
 
               <ul className="list-group list-group-flush">
@@ -182,16 +200,23 @@ export function MayoresDatos() {
                     className="list-group-item d-flex justify-content-between"
                   >
                     <span>{s.ubi}</span>
-                    <strong>{s.tamax} º</strong>
-                    <strong>{soloHora(s.fint)} </strong>
+                    <div className="text-end">
+                      <strong>{s.tamax} º</strong>
+
+                      <div className="text-muted small">
+                        {soloHora(s.fint)}{" h"}
+                      </div>
+                    </div>
                   </li>
                 ))}
               </ul>
             </div>
           </div>
-          {/*Card temp bajas*/}
-          <div className="card cards">
-            <div className="card-body" style={{ width: "18rem" }}>
+        </div>
+        {/*Card temp bajas*/}
+        <div className="col-12 col-md-6 col-lg-4">
+          <div className="card shadow h-100">
+            <div className="card-body">
               <h5 className="card-title">Temperatuas más bajas</h5>
 
               <ul className="list-group list-group-flush">
@@ -201,20 +226,23 @@ export function MayoresDatos() {
                     className="list-group-item d-flex justify-content-between"
                   >
                     <span>{s.ubi}</span>
-                    <strong>{s.tamin} º</strong>
-                    <br></br>
-                    <p>{soloHora(s.fint)} </p>
+                    <div className="text-end">
+                      <strong>{s.tamin} º</strong>
+                      <div className="text-muted small">
+                        {soloHora(s.fint)}{" h"}
+                      </div>
+                    </div>
                   </li>
                 ))}
               </ul>
             </div>
           </div>
         </div>
-        {/*Pie de página*/}
-        <div className="row sin-m">
-          <div className="col-12 pie">
-            <p className="textoPie">&copy;AEMET METEO IVÁN ESCOBAR</p>
-          </div>
+      </div>
+      {/*Pie de página*/}
+      <div className="row sin-m mt-5">
+        <div className="col-12 pie">
+          <p className="textoPie">&copy;AEMET METEO IVÁN ESCOBAR</p>
         </div>
       </div>
     </div>

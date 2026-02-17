@@ -76,7 +76,10 @@ function App() {
   };
 
   return (
+   
     <div className="container sin-p">
+
+      {/*Cabecera*/}
       <header className="bg-primary text-white py-4 mb-4">
         <div className="container d-flex flex-column flex-md-row align-items-center gap-3">
           <img src={aemetLogo} alt="logo AEMET" height="70" />
@@ -232,7 +235,7 @@ function App() {
         </div>
       </div>
       {/* Pie de página*/}
-      <div className="row sin-m">
+      <div className="row sin-m mt-5">
         <div className="col-12 pie">
           <p className="textoPie">&copy;AEMET METEO IVÁN ESCOBAR</p>
         </div>

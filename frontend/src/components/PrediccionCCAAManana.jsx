@@ -14,7 +14,7 @@ export function PrediccionCCAAManana() {
     // Si no hay ccaa no hace petición
     if (!ccaa) return;
     // Normaliza lo mandado por el usuario
-   
+
     const codigo = codigos_ccaa[ccaa];
 
     // Llamada al backend
@@ -41,62 +41,72 @@ export function PrediccionCCAAManana() {
   if (!datos) return <div className="text-center mt-5">Cargando...</div>;
 
   return (
-    <div>
+    <div className="container">
       {/*Cabecera*/}
-      <div>
-        <h1>Tiempo en España</h1>
-        <img src={aemetLogo} alt="logo de AEMET" />
-        <Link to="/">
-          <button>Volver al inicio</button>
-        </Link>
-      </div>
+      <header className="bg-primary text-white py-4 mb-4">
+        <div className="container d-flex flex-column flex-md-row align-items-center gap-3">
+          <img src={aemetLogo} alt="logo AEMET" height="70" />
+          <h1 className="m-0 fw-bold">El Tiempo en España</h1>
+          <Link to="/" className="ms-auto">
+            <button className="btn btn-light">Volver al inicio</button>
+          </Link>
+        </div>
+      </header>
       {/*Subcabecera*/}
       <div>
-        <ul class="nav">
+        <ul class="nav nav-tabs">
           <li class="nav-item">
-                
-
-            <a class="nav-link active" aria-current="page" href={`/prediccion/ccaa/hoy/${ccaa}`}>
+            <Link
+              className="nav-link"
+              to={`/prediccion/ccaa/hoy/${ccaa}`}
+            >
               Hoy
-            </a>
+            </Link>
           </li>
-          <li class="nav-item">
-            <a class="nav-link"  href={`/prediccion/ccaa/manana/${ccaa}`}>
+          <li class="nav-item ">
+            <Link className="nav-link active" to={`/prediccion/ccaa/manana/${ccaa}`}>
               Mañana
-            </a>
+            </Link>
           </li>
-          
          
         </ul>
       </div>
       {/*Datos de predicciones*/}
-      <div className="container my-4">
-        <h1>Predicción en {datos.ccaa}</h1>
-        <p className="text-muted">
-          {datos.validaPara} · Actualizado a las {datos.hora}
-        </p>
-
-        <h3>Fenómenos significativos</h3>
-        <ul>
-          {/*Recorre el array de fenomenos*/}
-          {datos.fenomenos.map((f, i) => (
-            // se usa key porque ayuda a react a identificar cada elemento de la lista
-            <li key={i}>{f}</li>
-          ))}
-        </ul>
-
-        <h3>Predicción</h3>
-        <ul>
-          {/*Recorre el array de predicciones*/}
-          {datos.prediccion.map((p, i) => (
-            <li key={i}>{p}</li>
-          ))}
-        </ul>
-
-        <p className="text-muted mt-3">Fuente: {datos.fuente}</p>
+      <div className="row my-4">
+        <div className="card shadow">
+          <div className="card-body">
+            <div className="d-flex flex-column jusitfy-content-betweeen align-items-start">
+              <h1>Predicción en {datos.ccaa}</h1>
+              <span className="text-muted small">
+                {datos.validaPara} · Actualizado a las {datos.hora}
+              </span>
+            </div>
+            {datos.fenomenos.length > 0 && (
+              <div className="alert alert-warning">
+                <h5 className="alert-heading mb-2">Fenómenos significativos</h5>
+                <ul className="mb-0">
+                  {datos.fenomenos.map((f, i) => (
+                    <li key={i}>{f}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            <div className="">
+              <h5>Predicción</h5>
+              <ul className="list-group ">
+                {/*Recorre el array de predicciones*/}
+                {datos.prediccion.map((p, i) => (
+                  <li className="list-group-item" key={i}>
+                    {p}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
       {/*Pie de página*/}
-      <div className="row sin-m">
+      <div className="row sin-m mt-5">
         <div className="col-12 pie">
           <p className="textoPie">&copy;AEMET METEO IVÁN ESCOBAR</p>
         </div>
