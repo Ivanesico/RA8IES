@@ -1,4 +1,3 @@
-// Función para parsear el texto plano que nos devuelve el endpoint a JSON
 export function parseAemetCcaaPrediction(rawText) {
   if (typeof rawText !== "string") {
     throw new TypeError(`rawText debe ser string, recibido: ${typeof rawText}`);
@@ -10,24 +9,37 @@ export function parseAemetCcaaPrediction(rawText) {
     .replace(/\n+/g, "\n")
     .trim();
 
+  // Versión en una sola línea (para regex robustas)
+  const oneLine = text.replace(/\n/g, " ");
+
   // 2. Extraer metadatos básicos
-  const ccaaMatch = text.match(/COMUNIDAD\s+DE\s+(?:LA\s+|EL\s+|LOS\s+|LAS\s+)?(.+)/i);
-  const fechaMatch = text.match(/D[ÍI]A\s+(.+?)\s+A\s+LAS\s+([0-9]{2}:[0-9]{2})/i);
-  const validaMatch = text.match(/PREDICCIÓN\s+VÁLIDA\s+PARA\s+EL\s+(.+)/i);
+  const ccaaMatch =
+    oneLine.match(/PREDICCI[ÓO]N\s+GENERAL\s+PARA\s+LA\s+COMUNIDAD\s+DEL\s+(.+?)(?=\s+D[ÍI]A\s+|\s*$)/i) ||
+    oneLine.match(/PREDICCI[ÓO]N\s+GENERAL\s+PARA\s+LA\s+COMUNIDAD\s+DE\s+(.+?)(?=\s+D[ÍI]A\s+|\s*$)/i) ||
+    oneLine.match(/PREDICCI[ÓO]N\s+GENERAL\s+PARA\s+LA\s+REGI[ÓO]N\s+DE\s+(.+?)(?=\s+D[ÍI]A\s+|\s*$)/i);
+
+
+  const fechaMatch = oneLine.match(
+    /D[ÍI]A\s+(.+?)\s+A\s+LAS\s+([0-9]{2}:[0-9]{2})/i
+  );
+
+  const validaMatch = oneLine.match(
+    /PREDICCI[ÓO]N\s+V[ÁA]LIDA\s+PARA\s+EL\s+(.+?)(?=\s+A\.\-|\s*$)/i
+  );
 
   const ccaa = ccaaMatch ? ccaaMatch[1].trim() : null;
   const fecha = fechaMatch ? fechaMatch[1].trim() : null;
   const hora = fechaMatch ? fechaMatch[2].trim() : null;
   const validaPara = validaMatch ? validaMatch[1].trim() : null;
 
-  // 3. Separar secciones A y B
-  const partes = text.split(/B\.\-\s*PREDICCIÓN/i);
-  const aSplit = partes[0].split(/A\.\-\s*FENÓMENOS\s+SIGNIFICATIVOS/i);
-  const fenomenosRaw = aSplit[1] ?? "";     // lo que viene después del título A.-
-  const prediccionRaw = partes[1] ?? "";    // lo que viene después del título B.-
+  // 3. Separar secciones A y B (esto sí lo dejamos con saltos)
+  const partes = text.split(/B\.\-\s*PREDICCI[ÓO]N/i);
+  const aSplit = partes[0].split(/A\.\-\s*FEN[ÓO]MENOS\s+SIGNIFICATIVOS/i);
 
+  const fenomenosRaw = aSplit[1] ?? "";
+  const prediccionRaw = partes[1] ?? "";
 
-  // 4. Convertir texto → arrays
+  // 4. Convertir texto → arrays (por líneas)
   const toArray = (block) =>
     String(block)              // convierte undefined/null a "undefined"/"null" pero no rompe
       .replace(/\n/g, " ")
@@ -45,6 +57,6 @@ export function parseAemetCcaaPrediction(rawText) {
     validaPara,
     fenomenos,
     prediccion,
-    fuente: "AEMET"
+    fuente: "AEMET",
   };
 }

@@ -1,3 +1,4 @@
+// Normaliza el texto y le da formato para la url
 export function toSlug(input) {
   return String(input ?? "")
     .trim()
