@@ -15,12 +15,22 @@ function App() {
   const [ccaa, setCcaa] = useState(""); //estado para mandar la ccaa escrita
   const [provincia, setProvincia] = useState(""); //estado para mandar la provincia escrita
   const [picked, setPicked] = useState(null); //estado para seleccionar la ubicacion clickada en el mapa
-  const centerSpain = useMemo(() => [40.4168, -3.7038], []); // sirve para centrar el mapa
+  const centerSpain = useMemo(() => [40.4168, -3.7038], []); // const para centrar el mapa
+  const [errorProvincia, setErrorProvincia] = useState(""); //estado para manejar el error en provincia
+  const [errorCCAA, setErrorCCAA] = useState(""); //estado para manejar el error en ccaa
+  const [errorUbi, setErrorUbi] = useState(""); //estado para manejar el error en la ubicación
 
   // Evento del botón de ccaa
   const ccaaSubmit = (e) => {
     e.preventDefault();
     const slug = toSlug(ccaa);
+    if (!slug) {
+      setErrorProvincia("");
+      setErrorUbi("");
+      setErrorCCAA("Debe introducir una CCAA");
+      return;
+    }
+    setErrorCCAA("");
     navegar(`/prediccion/ccaa/hoy/${slug}`);
   };
 
@@ -28,6 +38,13 @@ function App() {
   const provinciaSubmit = (e) => {
     e.preventDefault();
     const slug = toSlug(provincia);
+    if (!slug) {
+      setErrorCCAA("");
+      setErrorUbi("");
+      setErrorProvincia("Debe introducir una provincia");
+      return;
+    }
+    setErrorProvincia("");
     navegar(`/prediccion/provincia/hoy/${slug}`);
   };
 
@@ -41,13 +58,16 @@ function App() {
     // Obtiene la lat y lon actual y la manda a observacion
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        const { lat, lon } = pos.coords;
-        navegar(`/observacion/tiempo-real?lat=${lat}&lon=${lon}`);
+        setErrorUbi("");
+        const { latitude, longitude } = pos.coords;
+        navegar(`/observacion/tiempo-real?lat=${latitude}&lon=${longitude}`);
       },
-      (err) => {
-        alert("No se pudo obtener tu ubicación: " + err.message);
+      (e) => {
+        setErrorProvincia("");
+        setErrorCCAA("");
+        setErrorUbi("No se pudo obtener tu ubicación. " + e.message);
       },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
+      { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 },
     );
   };
 
@@ -76,9 +96,7 @@ function App() {
   };
 
   return (
-   
     <div className="container sin-p">
-
       {/*Cabecera*/}
       <header className="bg-primary text-white py-4 mb-4">
         <div className="container d-flex flex-column flex-md-row align-items-center gap-3">
@@ -90,6 +108,42 @@ function App() {
       {/* Cards*/}
       <div className="row mb-4">
         {/*Card prediccion ccaa*/}
+        {/*Manejo de texto vacío*/}
+        {errorCCAA && (
+          <div className="alert alert-primary d-flex" role="alert">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="currentColor"
+              className="bi bi-exclamation-triangle-fill flex-shrink-0 me-2"
+              viewBox="0 0 16 16"
+              role="img"
+              aria-label="Warning:"
+            >
+              <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+            </svg>
+            <div>Debe introducir una CCAA</div>
+          </div>
+        )}
+        {/*Manejo de texto vacío*/}
+        {errorProvincia && (
+          <div classname="alert alert-primary d-flex" role="alert">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="currentColor"
+              className="bi bi-exclamation-triangle-fill flex-shrink-0 me-2"
+              viewBox="0 0 16 16"
+              role="img"
+              aria-label="Warning:"
+            >
+              <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+            </svg>
+            <div>Debe introducir una provincia</div>
+          </div>
+        )}
         <div className="col-12 col-md-6 col-lg-4">
           <div className="card h-100 shadow">
             <div className="card-body">
@@ -107,6 +161,7 @@ function App() {
           </div>
         </div>
         {/*Card prediccion provincia*/}
+
         <div className="col-12 col-md-6 col-lg-4">
           <div className="card h-100 shadow">
             <div className="card-body">
@@ -143,10 +198,30 @@ function App() {
       </div>
       {/*Card observación tiempo real*/}
       <div className="row mb-4">
+        {/*Manejo de texto vacío*/}
+        {errorUbi && (
+          <div classname="alert alert-primary d-flex" role="alert">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="currentColor"
+              className="bi bi-exclamation-triangle-fill flex-shrink-0 me-2"
+              viewBox="0 0 16 16"
+              role="img"
+              aria-label="Warning:"
+            >
+              <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+            </svg>
+            <div>No hay acceso para obtener su ubicación</div>
+          </div>
+        )}
         <div className="col-12">
           <div className="card shadow">
             <div className="card-body">
-              <h3 className="card-title text-primary">Observación en tiempo real</h3>
+              <h3 className="card-title text-primary">
+                Observación en tiempo real
+              </h3>
               <p className="text-muted">
                 Selecciona un punto en el mapa o usa tu ubicación para ver la
                 estación mas cercana y sus datos actuales
@@ -223,7 +298,9 @@ function App() {
           <Link to="/radar" className="text-decoration-none">
             <div className="card shadow h-100">
               <div className="card-body">
-                <h3 className="card-title text-primary">Radar de lluvias de España</h3>
+                <h3 className="card-title text-primary">
+                  Radar de lluvias de España
+                </h3>
                 <img
                   className="img-fluid border rounded zoom-3 "
                   src="/api/aemet/red/radar/nacional"

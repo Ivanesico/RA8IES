@@ -8,37 +8,48 @@ export function PrediccionCCAAManana() {
   const { ccaa } = useParams(); //Lee el parámetro :ccaa de la url
   const [datos, setDatos] = useState(null); //Estado para guardar los datos recibidos del backend
   const [error, setError] = useState(null); //Estado para guardar un mensaje de error
+  const [loading, setLoading] = useState(true); // Estado para manejar el estado de carga de la página
+
+  // Normaliza lo mandado por el usuario
+  const codigo = codigos_ccaa[ccaa];
 
   // Se ejecuta al montar el componente o cada vez que cambie ccaa
   useEffect(() => {
-    // Si no hay ccaa no hace petición
-    if (!ccaa) return;
-    // Normaliza lo mandado por el usuario
+    // Si la ccaa no se encuentra en el diccionario
+    if (!codigo) {
+      setLoading(false);
+      setError("No se ha encontrado una CCAA llamada " + ccaa);
+      setDatos(null);
+      return;
+    }
 
-    const codigo = codigos_ccaa[ccaa];
+    // Encapsulamos la carga de forma async
+    const cargarDatos = async () => {
+      try {
+        // LLamada al backend
+        const res = await fetch(`/api/aemet/prediccion/ccaa/manana/${codigo}`);
 
-    // Llamada al backend
-    fetch(`/api/aemet/prediccion/ccaa/manana/${codigo}`)
-      // Recoge el json
-      .then(async (res) => {
         if (!res.ok) {
           const txt = await res.text();
           throw new Error(`HTTP ${res.status}: ${txt}`);
         }
-        return res.json();
-      })
-      .then((json) => {
-        // Si success es false lanza error
-        if (!json.success) throw new Error(json.error || "Error desconocido");
-        // Si no establece data del json a datos
+
+        const json = await res.json();
+
+        if (!json.success) {
+          throw new Error(json.error || "Error desconocido");
+        }
+
         setDatos(json.data);
-      })
-      .catch((e) => setError(e.message));
-  }, [ccaa]);
-  // Si hay error manda un mensaje con el error
-  if (error) return <div className="alert alert-danger mt-4">{error}</div>;
-  // Si no hay datos devuelve un texto
-  if (!datos) return <div className="text-center mt-5">Cargando...</div>;
+      } catch (e) {
+        setError("No se pudieron obtener los datos. " + e.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    cargarDatos();
+  }, [codigo]);
 
   return (
     <div className="container">
@@ -52,58 +63,93 @@ export function PrediccionCCAAManana() {
           </Link>
         </div>
       </header>
+
       {/*Subcabecera*/}
       <div>
         <ul class="nav nav-tabs">
           <li class="nav-item">
-            <Link
-              className="nav-link"
-              to={`/prediccion/ccaa/hoy/${ccaa}`}
-            >
+            <Link className="nav-link" to={`/prediccion/ccaa/hoy/${ccaa}`}>
               Hoy
             </Link>
           </li>
           <li class="nav-item ">
-            <Link className="nav-link active" to={`/prediccion/ccaa/manana/${ccaa}`}>
+            <Link
+              className="nav-link active"
+              to={`/prediccion/ccaa/manana/${ccaa}`}
+            >
               Mañana
             </Link>
           </li>
-         
         </ul>
       </div>
+
       {/*Datos de predicciones*/}
       <div className="row my-4">
-        <div className="card shadow">
-          <div className="card-body">
-            <div className="d-flex flex-column jusitfy-content-betweeen align-items-start">
-              <h1>Predicción en {datos.ccaa}</h1>
-              <span className="text-muted small">
-                {datos.validaPara} · Actualizado a las {datos.hora}
-              </span>
+        {/* Loading */}
+        {loading && (
+          <div className="text-center py-5">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden"></span>
             </div>
-            {datos.fenomenos.length > 0 && (
-              <div className="alert alert-warning">
-                <h5 className="alert-heading mb-2">Fenómenos significativos</h5>
-                <ul className="mb-0">
-                  {datos.fenomenos.map((f, i) => (
-                    <li key={i}>{f}</li>
+          </div>
+        )}
+        {/* Error */}
+        {error && (
+          <div
+            className="alert alert-primary d-flex align-items-center shadow-sm"
+            role="alert"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="currentColor"
+              className="bi bi-exclamation-triangle-fill flex-shrink-0 me-2"
+              viewBox="0 0 16 16"
+              role="img"
+              aria-label="Warning:"
+            >
+              <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+            </svg>
+            <div>{error}</div>
+          </div>
+        )}
+        {/*Si no está cargando, hay datos y no hay error, muestra los datos*/}
+        {!loading && !error && datos && (
+          <div className="card shadow">
+            <div className="card-body">
+              <div className="d-flex flex-column jusitfy-content-betweeen align-items-start">
+                <h1>Predicción en {datos.ccaa}</h1>
+                <span className="text-muted small">
+                  {datos.validaPara} · Actualizado a las {datos.hora}
+                </span>
+              </div>
+              {datos.fenomenos.length > 0 && (
+                <div className="alert alert-warning">
+                  <h5 className="alert-heading mb-2">
+                    Fenómenos significativos
+                  </h5>
+                  <ul className="mb-0">
+                    {datos.fenomenos.map((f, i) => (
+                      <li key={i}>{f}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              <div className="">
+                <h5>Predicción</h5>
+                <ul className="list-group ">
+                  {/*Recorre el array de predicciones*/}
+                  {datos.prediccion.map((p, i) => (
+                    <li className="list-group-item" key={i}>
+                      {p}
+                    </li>
                   ))}
                 </ul>
               </div>
-            )}
-            <div className="">
-              <h5>Predicción</h5>
-              <ul className="list-group ">
-                {/*Recorre el array de predicciones*/}
-                {datos.prediccion.map((p, i) => (
-                  <li className="list-group-item" key={i}>
-                    {p}
-                  </li>
-                ))}
-              </ul>
             </div>
           </div>
-        </div>
+        )}
       </div>
       {/*Pie de página*/}
       <div className="row sin-m mt-5">

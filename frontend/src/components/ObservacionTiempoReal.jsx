@@ -27,49 +27,51 @@ export function ObservacionTiempoReal() {
   const [estaciones, setEstaciones] = useState([]); //estado de las estaciones
   const [loading, setLoading] = useState(true); //estado para controlar si se esta esperando la respuesta del fetch
   const [error, setError] = useState(""); //estado para guardar el error
+  const MAX_DISTANCIA = 150; // distancia máxima permitida
 
-  // pide las estaciones al backend
+  const coordsValidas = Number.isFinite(lat) && Number.isFinite(lon);
   // se hace solo una vez ya que devuelve muchas y ya ahí hacemos la busqueda por coord
   useEffect(() => {
-    let cancelled = false;
-
+    if (!coordsValidas) {
+      setLoading(false);
+      setError("Faltan coordenadas en la URL.");
+      return;
+    }
     // Se crea la función load para encapsular el fetch y poder llamarlo de forma async
-    async function load() {
+    const cargarDatos = async () => {
       try {
         setLoading(true);
         setError("");
-        // Hace la llamada a la api
+        setEstaciones([]);
+
         const res = await fetch("/api/aemet/observacion/convencional/todas");
+
         if (!res.ok) throw new Error("HTTP " + res.status);
-        // Recoge el json
+
         const json = await res.json();
-        // Recoge el array de estaciones de data del json
+
+        if (!json.success) throw new Error(json.error || "Error desconocido");
+
         const estacionesArray = Array.isArray(json?.data) ? json.data : [];
 
-        if (!cancelled) {
-          setEstaciones(estacionesArray);
-        }
+        setEstaciones(estacionesArray);
       } catch (e) {
-        if (!cancelled) setError(e.message || "Error");
+        setError("No se pudieron obtener los datos. " + e.message);
       } finally {
-        if (!cancelled) setLoading(false);
+        setLoading(false);
       }
-    }
-
-    load();
-    return () => {
-      cancelled = true;
     };
-  }, []);
+
+    cargarDatos();
+  }, [coordsValidas]);
+
   // Calcula la estación mas cercana
   const nearest = useMemo(() => {
     //useMemo guarda el resultado que solo recalcula si cambia la estacion
-    console.log("lat/lon query:", lat, lon);
-    console.log("estaciones length:", estaciones.length);
+    
     // Si estaciones no contiene nada devuelve null
-    if (!estaciones.length) return null;
+    if (!estaciones.length || !coordsValidas) return null;
 
-    // Ca
     let mejorEstacion = null; // guarda la mejor estación encontrada
     let mejorDistancia = Infinity; // guarda la distancia mas corta, se declara infinito para que en cuanto haya un numero de menor valor se aplique
 
@@ -77,6 +79,7 @@ export function ObservacionTiempoReal() {
     for (const estacion of estaciones) {
       const sLat = Number(estacion.lat);
       const sLon = Number(estacion.lon);
+
       if (!Number.isFinite(sLat) || !Number.isFinite(sLon)) continue;
       // Calcula la distancia
       const distancia = haversineKm(lat, lon, sLat, sLon);
@@ -86,29 +89,19 @@ export function ObservacionTiempoReal() {
       }
     }
 
-    console.log(
-      "mejorEstacion:",
-      mejorEstacion?.ubi,
-      "mejorDistancia:",
-      mejorDistancia,
-    );
+    if(mejorDistancia> MAX_DISTANCIA){
+      return null;
+    }
     return mejorEstacion
       ? { estacion: mejorEstacion, distanciaKm: mejorDistancia }
       : null;
-  }, [estaciones, lat, lon]);
+  }, [estaciones, lat, lon, coordsValidas]);
 
-  if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
-    return (
-      <div className="container py-4">
-        <div className="alert alert-warning">
-          Faltan coordenadas (lat/lon) en la URL.
-        </div>
-      </div>
-    );
-  }
+  
 
   return (
     <div className="container">
+
       {/*Cabecera*/}
       <header className="bg-primary text-white py-4 mb-4">
         <div className="container d-flex flex-column flex-md-row align-items-center gap-3">
@@ -130,12 +123,18 @@ export function ObservacionTiempoReal() {
         </div>
       </div>
 
+        {/*Loading */}
       {loading && (
         <div className="text-center">
           <span className="spinner-border text-primary" role="status" />
         </div>
       )}
-      {error && <div className="alert alert-danger shadow">Error: {error}</div>}
+      {/*Error */}
+        {!loading && error && (
+          <div className="alert alert-primary shadow-sm">
+            {error}
+          </div>
+        )}
 
       {!loading && !error && nearest?.estacion && (
         <div className="card shadow-sm border-0">
@@ -208,8 +207,8 @@ export function ObservacionTiempoReal() {
       )}
 
       {!loading && !error && !nearest?.estacion && (
-        <div className="alert alert-warning shadow">
-          No se encontró estación cercana.
+        <div className="alert alert-primary shadow">
+          La ubicación seleccionada no parece estar en España.
         </div>
       )}
       {/*Pie de página*/}
