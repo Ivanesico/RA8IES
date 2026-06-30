@@ -1,5 +1,5 @@
 import "./App.css";
-import { Radar } from "./components/radar";
+import { Radar } from "./components/Radar";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useState, useMemo } from "react";
