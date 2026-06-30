@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import App from "../src/App";
-import { Radar } from "../src/components/radar";
+import { Radar } from "../src/components/Radar";
 import { PrediccionCCAA } from "../src/components/PrediccionCCAA";
 import { PrediccionCCAAManana } from "../src/components/PrediccionCCAAManana";
 import { PrediccionProvincia } from "../src/components/PrediccionProvincia";
